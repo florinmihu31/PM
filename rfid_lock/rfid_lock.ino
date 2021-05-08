@@ -63,7 +63,7 @@ void setup() {
   // Afiseaza detalii despre reader
   show_reader_details();
 
-  //Wipe Code - If the Button (wipe_b) Pressed while setup run (powered on) it wipes EEPROM
+  // Wipe Code - If the Button (wipe_b) Pressed while setup run (powered on) it wipes EEPROM
   if (digitalRead(wipe_b) == LOW) {  // when button pressed pin should get low, button connected to ground
     digitalWrite(red_led, HIGH); // Red Led stays on to inform user we are going to wipe
     
@@ -77,10 +77,8 @@ void setup() {
       Serial.println(F("Starting Wiping EEPROM"));
     
       for (uint16_t x = 0; x < EEPROM.length(); x = x + 1) {    //Loop end of EEPROM address
-        if (EEPROM.read(x) == 0) {
-          // do nothing, already clear, go to the next address in order to save time and reduce writes to EEPROM
-        } else {
-          EEPROM.write(x, 0);       // if not write 0 to clear, it takes 3.3mS
+        if (EEPROM.read(x) != 0) {
+          EEPROM.write(x, 0);
         }
       }
       
@@ -88,12 +86,16 @@ void setup() {
       
       digitalWrite(red_led, LOW);  // visualize a successful wipe
       delay(led_delay);
+      
       digitalWrite(red_led, HIGH);
       delay(led_delay);
+      
       digitalWrite(red_led, LOW);
       delay(led_delay);
+      
       digitalWrite(red_led, HIGH);
       delay(led_delay);
+      
       digitalWrite(red_led, LOW);
     } else {
       Serial.println(F("Wiping Cancelled"));
@@ -261,7 +263,7 @@ uint8_t get_ID() {
     return 0;
   }
   
-  if (!mfrc522.PICC_read_cardSerial()) {
+  if (!mfrc522.PICC_ReadCardSerial()) {
     return 0;
   }
 
