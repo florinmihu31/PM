@@ -10,7 +10,7 @@
 #define wipe_b      0
 
 // Timpul de deblocare al incuietorii
-#define lock_delay 5000
+#define lock_delay 2000
 
 // Timpul de aprindere/stingere al LED-ului
 #define led_delay 200
@@ -51,7 +51,7 @@ void setup() {
   // Setez releul ca OUTPUT
   pinMode(relay, OUTPUT);
   
-  digitalWrite(relay, HIGH);
+  digitalWrite(relay, LOW);
   digitalWrite(red_led, LOW);
   digitalWrite(green_led, LOW);
   digitalWrite(blue_led, LOW);
@@ -240,14 +240,15 @@ void loop () {
   }
 }
 
+// HIGH = DESCHIS
 void granted(uint16_t set_delay) {
   digitalWrite(blue_led, LOW);
   digitalWrite(red_led, LOW);
   digitalWrite(green_led, HIGH);
-  digitalWrite(relay, LOW);
+  digitalWrite(relay, HIGH);
   delay(set_delay);
 
-  digitalWrite(relay, HIGH);
+  digitalWrite(relay, LOW);
   delay(access_led_delay);
 }
 
@@ -331,7 +332,7 @@ void normal_mode_on() {
   digitalWrite(blue_led, HIGH);
   digitalWrite(red_led, LOW);
   digitalWrite(green_led, LOW);
-  digitalWrite(relay, HIGH);
+  digitalWrite(relay, LOW);
 }
 
 void read_ID(uint8_t number) {
