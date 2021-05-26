@@ -145,6 +145,14 @@ void setup() {
 
 void loop () {
   do {
+    char ch = Serial.read();
+
+    if (ch == 'a') {
+      digitalWrite(relay, HIGH);
+      delay(lock_delay);
+      digitalWrite(relay, LOW);
+    }
+
     // Iau ID-ul
     success_read = get_ID();
     
