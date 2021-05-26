@@ -62,46 +62,6 @@ void setup() {
 
   // Afiseaza detalii despre reader
   show_reader_details();
-
-  // Wipe Code - If the Button (wipe_b) Pressed while setup run (powered on) it wipes EEPROM
-  if (digitalRead(wipe_b) == LOW) {  // when button pressed pin should get low, button connected to ground
-    digitalWrite(red_led, HIGH); // Red Led stays on to inform user we are going to wipe
-    
-    Serial.println(F("Wipe Button Pressed"));
-    Serial.println(F("You have 10 seconds to Cancel"));
-    Serial.println(F("This will be remove all records and cannot be undone"));
-    
-    bool buttonState = monitorwipe_button(10000); // Give user enough time to cancel operation
-    
-    if (buttonState == true && digitalRead(wipe_b) == LOW) {    // If button still be pressed, wipe EEPROM
-      Serial.println(F("Starting Wiping EEPROM"));
-    
-      for (uint16_t x = 0; x < EEPROM.length(); x = x + 1) {    //Loop end of EEPROM address
-        if (EEPROM.read(x) != 0) {
-          EEPROM.write(x, 0);
-        }
-      }
-      
-      Serial.println(F("EEPROM Successfully Wiped"));
-      
-      digitalWrite(red_led, LOW);  // visualize a successful wipe
-      delay(led_delay);
-      
-      digitalWrite(red_led, HIGH);
-      delay(led_delay);
-      
-      digitalWrite(red_led, LOW);
-      delay(led_delay);
-      
-      digitalWrite(red_led, HIGH);
-      delay(led_delay);
-      
-      digitalWrite(red_led, LOW);
-    } else {
-      Serial.println(F("Wiping Cancelled"));
-      digitalWrite(red_led, LOW);
-    }
-  }
   
   // Retinem un numar magic pentru a vedea daca este definit cardul master
   if (EEPROM.read(1) != magic_number) {
@@ -155,29 +115,6 @@ void loop () {
 
     // Iau ID-ul
     success_read = get_ID();
-    
-    // When device is in use if wipe button pressed for 10 seconds initialize Master Card wiping
-    if (digitalRead(wipe_b) == LOW) { // Check if button is pressed
-      // Visualize normal operation is iterrupted by pressing wipe button Red is like more Warning to user
-      digitalWrite(red_led, HIGH);  // Make sure led is off
-      digitalWrite(green_led, LOW);  // Make sure led is off
-      digitalWrite(blue_led, LOW); // Make sure led is off
-      
-      // Give some feedback
-      Serial.println(F("Wipe Button Pressed"));
-      Serial.println(F("Master Card will be Erased! in 10 seconds"));
-      
-      bool buttonState = monitorwipe_button(10000); // Give user enough time to cancel operation
-      
-      if (buttonState == true && digitalRead(wipe_b) == LOW) {    // If button still be pressed, wipe EEPROM
-        EEPROM.write(1, 0);                  // Reset Magic Number.
-        Serial.println(F("Master Card Erased from device"));
-        Serial.println(F("Please reset to re-program Master Card"));
-        while (1);
-      }
-      
-      Serial.println(F("Master Card Erase Cancelled"));
-    }
 
     // Verificam daca este modul program
     if (program_mode) {
@@ -532,18 +469,4 @@ void success_delete() {
 
 bool is_master(byte test[]) {
 	return check_two(test, master_card);
-}
-
-bool monitorwipe_button(uint32_t interval) {
-  uint32_t now = (uint32_t)millis();
-
-  while ((uint32_t)millis() - now < interval)  {
-    // check on every half a second
-    if (((uint32_t)millis() % 500) == 0) {
-      if (digitalRead(wipe_b) != LOW)
-        return false;
-    }
-  }
-
-  return true;
 }
