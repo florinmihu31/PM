@@ -7,7 +7,6 @@
 #define blue_led    2
 
 #define relay       5
-#define wipe_b      0
 
 // Timpul de deblocare al incuietorii
 #define lock_delay 2000
@@ -44,9 +43,6 @@ void setup() {
   pinMode(red_led, OUTPUT);
   pinMode(green_led, OUTPUT);
   pinMode(blue_led, OUTPUT);
-
-  // Setez butonul de wipe ca INPUT_PULLUP
-  pinMode(wipe_b, INPUT_PULLUP);
   
   // Setez releul ca OUTPUT
   pinMode(relay, OUTPUT);
@@ -105,14 +101,6 @@ void setup() {
 
 void loop () {
   do {
-    char ch = Serial.read();
-
-    if (ch == 'a') {
-      digitalWrite(relay, HIGH);
-      delay(lock_delay);
-      digitalWrite(relay, LOW);
-    }
-
     // Iau ID-ul
     success_read = get_ID();
 
