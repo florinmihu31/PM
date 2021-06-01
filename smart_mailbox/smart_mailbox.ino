@@ -2,23 +2,23 @@
 #include <SPI.h>
 #include <MFRC522.h>
 
-#define red_led     3
-#define green_led   4
-#define blue_led    2
+#define RED_LED     3
+#define GREEN_LED   4
+#define BLUE_LED    2
 
-#define relay       5
+#define TRANSISTOR  5
 
 // Timpul de deblocare al incuietorii
-#define lock_delay 2000
+#define LOCK_DELAY  2000
 
 // Timpul de aprindere/stingere al LED-ului
-#define led_delay 200
+#define LED_DELAY   200
 
 // Timpul de aprindere/stingere al LED-ului cand se acceseaza senzorul
-#define access_led_delay 1000
+#define ACCESS_LED_DELAY 1000
 
 // Numar magic pentru detectia cardului master
-#define magic_number 143
+#define MAGIC_NUMBER 143
 
 // Modul program
 bool program_mode = false;
@@ -40,17 +40,17 @@ MFRC522 mfrc522(SS_PIN, RST_PIN);
 
 void setup() {
   // Setez LED-urile ca OUTPUT
-  pinMode(red_led, OUTPUT);
-  pinMode(green_led, OUTPUT);
-  pinMode(blue_led, OUTPUT);
+  pinMode(RED_LED, OUTPUT);
+  pinMode(GREEN_LED, OUTPUT);
+  pinMode(BLUE_LED, OUTPUT);
   
   // Setez releul ca OUTPUT
-  pinMode(relay, OUTPUT);
+  pinMode(TRANSISTOR, OUTPUT);
   
-  digitalWrite(relay, LOW);
-  digitalWrite(red_led, LOW);
-  digitalWrite(green_led, LOW);
-  digitalWrite(blue_led, LOW);
+  digitalWrite(TRANSISTOR, LOW);
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(GREEN_LED, LOW);
+  digitalWrite(BLUE_LED, LOW);
 
   Serial.begin(9600);
   SPI.begin();
@@ -60,17 +60,17 @@ void setup() {
   show_reader_details();
   
   // Retinem un numar magic pentru a vedea daca este definit cardul master
-  if (EEPROM.read(1) != magic_number) {
+  if (EEPROM.read(1) != MAGIC_NUMBER) {
     Serial.println(F("No Master Card Defined"));
     Serial.println(F("Scan A PICC to Define as Master Card"));
     
     do {
       success_read = get_ID(); // Iau ID-ul
       
-      digitalWrite(blue_led, HIGH);
-      delay(led_delay);
-      digitalWrite(blue_led, LOW);
-      delay(led_delay);
+      digitalWrite(BLUE_LED, HIGH);
+      delay(LED_DELAY);
+      digitalWrite(BLUE_LED, LOW);
+      delay(LED_DELAY);
     } while (!success_read);
 
     // Scriu in EEPROM ID-ul cardului master
@@ -78,7 +78,7 @@ void setup() {
       EEPROM.write(j + 2, read_card[j]);
     }
     
-    EEPROM.write(1, magic_number);
+    EEPROM.write(1, MAGIC_NUMBER);
     Serial.println(F("Master Card Defined"));
   }
   
@@ -163,7 +163,7 @@ void loop () {
       if (find_ID(read_card)) {
         // Permit accesul
         Serial.println(F("Welcome, You shall pass"));
-        granted(lock_delay);
+        granted(LOCK_DELAY);
       } else {
         // Refuz accesul
         Serial.println(F("You shall not pass"));
@@ -173,23 +173,22 @@ void loop () {
   }
 }
 
-// HIGH = DESCHIS
 void granted(uint16_t set_delay) {
-  digitalWrite(blue_led, LOW);
-  digitalWrite(red_led, LOW);
-  digitalWrite(green_led, HIGH);
-  digitalWrite(relay, HIGH);
+  digitalWrite(BLUE_LED, LOW);
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(GREEN_LED, HIGH);
+  digitalWrite(TRANSISTOR, HIGH);
   delay(set_delay);
 
-  digitalWrite(relay, LOW);
-  delay(access_led_delay);
+  digitalWrite(TRANSISTOR, LOW);
+  delay(ACCESS_LED_DELAY);
 }
 
 void denied() {
-  digitalWrite(green_led, LOW);
-  digitalWrite(blue_led, LOW);
-  digitalWrite(red_led, HIGH);
-  delay(access_led_delay);
+  digitalWrite(GREEN_LED, LOW);
+  digitalWrite(BLUE_LED, LOW);
+  digitalWrite(RED_LED, HIGH);
+  delay(ACCESS_LED_DELAY);
 }
 
 uint8_t get_ID() {
@@ -237,35 +236,35 @@ void show_reader_details() {
     Serial.println(F("SYSTEM HALTED: Check connections."));
     
     // Visualize system is halted
-    digitalWrite(green_led, LOW);  // Make sure green LED is off
-    digitalWrite(blue_led, LOW);   // Make sure blue LED is off
-    digitalWrite(red_led, HIGH);   // Turn on red LED
+    digitalWrite(GREEN_LED, LOW);  // Make sure green LED is off
+    digitalWrite(BLUE_LED, LOW);   // Make sure blue LED is off
+    digitalWrite(RED_LED, HIGH);   // Turn on red LED
     while (true); // do not go further
   }
 }
 
 void cycle_leds() {
-  digitalWrite(red_led, LOW);
-  digitalWrite(green_led, HIGH);
-  digitalWrite(blue_led, LOW);
-  delay(led_delay);
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(GREEN_LED, HIGH);
+  digitalWrite(BLUE_LED, LOW);
+  delay(LED_DELAY);
   
-  digitalWrite(red_led, LOW);
-  digitalWrite(green_led, LOW);
-  digitalWrite(blue_led, HIGH);
-  delay(led_delay);
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(GREEN_LED, LOW);
+  digitalWrite(BLUE_LED, HIGH);
+  delay(LED_DELAY);
   
-  digitalWrite(red_led, HIGH);
-  digitalWrite(green_led, LOW);
-  digitalWrite(blue_led, LOW);
-  delay(led_delay);
+  digitalWrite(RED_LED, HIGH);
+  digitalWrite(GREEN_LED, LOW);
+  digitalWrite(BLUE_LED, LOW);
+  delay(LED_DELAY);
 }
 
 void normal_mode_on() {
-  digitalWrite(blue_led, HIGH);
-  digitalWrite(red_led, LOW);
-  digitalWrite(green_led, LOW);
-  digitalWrite(relay, LOW);
+  digitalWrite(BLUE_LED, HIGH);
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(GREEN_LED, LOW);
+  digitalWrite(TRANSISTOR, LOW);
 }
 
 void read_ID(uint8_t number) {
@@ -284,7 +283,7 @@ void write_ID(byte a[]) {
     // Extrag numarul de chei stocate
     uint8_t num = EEPROM.read(0);
     // Calculez locul unde ar trebui sa stochez ID-ul
-    uint8_t start = ( num * 4 ) + 6;
+    uint8_t start = (num * 4) + 6;
     
     // Rescriu noul numar de chei
     num++;
@@ -387,72 +386,72 @@ bool find_ID(byte find[]) {
 
 void success_write() {
   // Se aprinde LED-ul verde de 3 ori
-  digitalWrite(blue_led, LOW);
-  digitalWrite(red_led, LOW);
-  digitalWrite(green_led, LOW);
-  delay(led_delay);
+  digitalWrite(BLUE_LED, LOW);
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(GREEN_LED, LOW);
+  delay(LED_DELAY);
 
-  digitalWrite(green_led, HIGH);
-  delay(led_delay);
+  digitalWrite(GREEN_LED, HIGH);
+  delay(LED_DELAY);
   
-  digitalWrite(green_led, LOW);
-  delay(led_delay);
+  digitalWrite(GREEN_LED, LOW);
+  delay(LED_DELAY);
   
-  digitalWrite(green_led, HIGH);
-  delay(led_delay);
+  digitalWrite(GREEN_LED, HIGH);
+  delay(LED_DELAY);
   
-  digitalWrite(green_led, LOW);
-  delay(led_delay);
+  digitalWrite(GREEN_LED, LOW);
+  delay(LED_DELAY);
   
-  digitalWrite(green_led, HIGH);
-  delay(led_delay);
+  digitalWrite(GREEN_LED, HIGH);
+  delay(LED_DELAY);
 }
 
 // Flashes the red LED 3 times to indicate a failed write to EEPROM
 void failed_write() {
   // Se aprinde LED-ul rosu de 3 ori
-  digitalWrite(blue_led, LOW);
-  digitalWrite(red_led, LOW);
-  digitalWrite(green_led, LOW);
-  delay(led_delay);
+  digitalWrite(BLUE_LED, LOW);
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(GREEN_LED, LOW);
+  delay(LED_DELAY);
 
-  digitalWrite(red_led, HIGH);
-  delay(led_delay);
+  digitalWrite(RED_LED, HIGH);
+  delay(LED_DELAY);
   
-  digitalWrite(red_led, LOW);
-  delay(led_delay);
+  digitalWrite(RED_LED, LOW);
+  delay(LED_DELAY);
   
-  digitalWrite(red_led, HIGH);
-  delay(led_delay);
+  digitalWrite(RED_LED, HIGH);
+  delay(LED_DELAY);
   
-  digitalWrite(red_led, LOW);
-  delay(led_delay);
+  digitalWrite(RED_LED, LOW);
+  delay(LED_DELAY);
   
-  digitalWrite(red_led, HIGH);
-  delay(led_delay);
+  digitalWrite(RED_LED, HIGH);
+  delay(LED_DELAY);
 }
 
 void success_delete() {
   // Se aprinde LED-ul albastru de 3 ori
-  digitalWrite(blue_led, LOW);
-  digitalWrite(red_led, LOW);
-  digitalWrite(green_led, LOW);
-  delay(led_delay);
+  digitalWrite(BLUE_LED, LOW);
+  digitalWrite(RED_LED, LOW);
+  digitalWrite(GREEN_LED, LOW);
+  delay(LED_DELAY);
   
-  digitalWrite(blue_led, HIGH);
-  delay(led_delay);
+  digitalWrite(BLUE_LED, HIGH);
+  delay(LED_DELAY);
   
-  digitalWrite(blue_led, LOW);
-  delay(led_delay);
+  digitalWrite(BLUE_LED, LOW);
+  delay(LED_DELAY);
   
-  digitalWrite(blue_led, HIGH);
-  delay(led_delay);
+  digitalWrite(BLUE_LED, HIGH);
+  delay(LED_DELAY);
   
-  digitalWrite(blue_led, LOW);
-  delay(led_delay);
+  digitalWrite(BLUE_LED, LOW);
+  delay(LED_DELAY);
   
-  digitalWrite(blue_led, HIGH);
-  delay(led_delay);
+  digitalWrite(BLUE_LED, HIGH);
+  delay(LED_DELAY);
 }
 
 bool is_master(byte test[]) {
